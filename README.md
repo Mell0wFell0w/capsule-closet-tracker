@@ -1,73 +1,47 @@
-# React + TypeScript + Vite
+# Capsule Closet Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A wardrobe management app for IS 542 (BYU). Track your clothing across 16 categories, record replacement targets, and fetch real-time prices from Google Shopping via SerpApi. A stats page shows spending breakdowns with Recharts charts.
 
-Currently, two official plugins are available:
+## Running the Project
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+For local development with the price-fetching serverless function, install the Vercel CLI and run:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm i -g vercel
+vercel dev
 ```
+
+Set `SERPAPI_KEY` as an environment variable (Vercel dashboard or `.env.local` for local dev).
+
+## Running Tests
+
+```bash
+npm test
+```
+
+## API Used
+
+**SerpApi — Google Shopping**
+
+- Endpoint: `https://serpapi.com/search.json?engine=google_shopping&q=<query>`
+- Proxied through a Vercel serverless function at `/api/fetch-price` so the API key stays server-side and never reaches the browser.
+- Prices are fetched on-demand only (user clicks "Fetch Price"). The free SerpApi tier gives 250 searches total — no auto-fetching.
+- The lowest price from the returned results is stored in `Replacement.fetchedPrice`. All data persists in `localStorage`.
+
+## Features
+
+- **Closet view** — list of all clothing items with category filter, name/brand search, archive toggle, and per-row click to view/edit details.
+- **Item detail modal** — view all fields, switch to edit mode, archive/unarchive, delete (with confirmation). Each item can have one linked replacement.
+- **Replacements view** — two tabs: *Linked* (tied to a closet item) and *Wishlist* (standalone). Each row has a live "Fetch Price" button, inline editing, and a "Link to Item" action for wishlist entries.
+- **Stats view** — summary numbers (wardrobe value, replacement cost, item counts), pie chart of value by category, bar chart of items per category, and a comparison bar chart of purchase vs. replacement cost.
+- **Light / dark mode** — toggle in the navbar. Preference persists in `localStorage`.
+- **Fully offline-capable** — all data lives in `localStorage`. No login required.
+
+## Deployed Version
+
+[https://capsule-closet-tracker.vercel.app](https://capsule-closet-tracker.vercel.app)
