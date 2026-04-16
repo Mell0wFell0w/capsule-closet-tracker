@@ -22,6 +22,7 @@ const EMPTY: Omit<ClothingItem, "id" | "isArchived" | "lastModified"> = {
 
 export default function AddItemForm({ onAdd, onClose }: AddItemFormProps) {
   const [form, setForm] = useState(EMPTY);
+  const [priceInput, setPriceInput] = useState("0");
   const [errors, setErrors] = useState<Partial<Record<keyof typeof EMPTY, string>>>({});
 
   function set<K extends keyof typeof EMPTY>(key: K, value: typeof EMPTY[K]) {
@@ -35,7 +36,8 @@ export default function AddItemForm({ onAdd, onClose }: AddItemFormProps) {
     if (!form.brand.trim()) e.brand = "Brand is required";
     if (!form.color.trim()) e.color = "Color is required";
     if (!form.size.trim()) e.size = "Size is required";
-    if (form.purchasePrice < 0) e.purchasePrice = "Price must be 0 or more";
+    const parsedPrice = parseFloat(priceInput);
+    if (isNaN(parsedPrice) || parsedPrice < 0) e.purchasePrice = "Price must be 0 or more";
     if (!form.purchaseDate) e.purchaseDate = "Date is required";
     return e;
   }
@@ -50,6 +52,7 @@ export default function AddItemForm({ onAdd, onClose }: AddItemFormProps) {
     const now = new Date().toISOString();
     const item: ClothingItem = {
       ...form,
+      purchasePrice: parseFloat(priceInput) || 0,
       id: crypto.randomUUID(),
       isArchived: false,
       lastModified: now,
@@ -139,8 +142,11 @@ export default function AddItemForm({ onAdd, onClose }: AddItemFormProps) {
                     type="number"
                     min={0}
                     step={0.01}
-                    value={form.purchasePrice}
-                    onChange={(e) => set("purchasePrice", parseFloat(e.target.value) || 0)}
+                    value={priceInput}
+                    onChange={(e) => {
+                      setPriceInput(e.target.value);
+                      setErrors((prev) => ({ ...prev, purchasePrice: undefined }));
+                    }}
                   />
                   {errors.purchasePrice && <span className="form-error">{errors.purchasePrice}</span>}
                 </div>

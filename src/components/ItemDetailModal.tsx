@@ -32,6 +32,7 @@ export default function ItemDetailModal({
 }: ItemDetailModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<ClothingItem>({ ...item });
+  const [priceInput, setPriceInput] = useState(String(item.purchasePrice));
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showAddReplacement, setShowAddReplacement] = useState(false);
 
@@ -40,12 +41,17 @@ export default function ItemDetailModal({
   }
 
   function handleSave() {
-    onUpdate({ ...formData, lastModified: new Date().toISOString() });
+    onUpdate({
+      ...formData,
+      purchasePrice: parseFloat(priceInput) || 0,
+      lastModified: new Date().toISOString(),
+    });
     setIsEditing(false);
   }
 
   function handleCancelEdit() {
     setFormData({ ...item });
+    setPriceInput(String(item.purchasePrice));
     setIsEditing(false);
   }
 
@@ -141,8 +147,8 @@ export default function ItemDetailModal({
                 <div className="form-group">
                   <label className="form-label">Purchase Price ($)</label>
                   <input className="form-input" type="number" min={0} step={0.01}
-                    value={formData.purchasePrice}
-                    onChange={(e) => setField("purchasePrice", parseFloat(e.target.value) || 0)} />
+                    value={priceInput}
+                    onChange={(e) => setPriceInput(e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Purchase Date</label>
