@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Plus, Shirt } from "lucide-react";
+import { Plus, Shirt, Upload } from "lucide-react";
 import type { ClothingItem, Category, Replacement } from "../types";
 import { CATEGORIES, CATEGORY_LABELS } from "../types";
 import { filterItems } from "../utils/filters";
 import AddItemForm from "./AddItemForm";
 import ItemDetailModal from "./ItemDetailModal";
+import CsvImportModal from "./CsvImportModal";
 
 interface ClosetViewProps {
   items: ClothingItem[];
@@ -36,6 +37,7 @@ export default function ClosetView({
   const [searchTerm, setSearchTerm] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showCsvImport, setShowCsvImport] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null);
 
   const visible = items.filter((i) => showArchived || !i.isArchived);
@@ -74,6 +76,9 @@ export default function ClosetView({
             Show archived
           </label>
         </div>
+        <button className="btn btn-secondary" onClick={() => setShowCsvImport(true)}>
+          <Upload size={15} /> Import CSV
+        </button>
         <button className="btn btn-primary" onClick={() => setShowAddForm(true)}>
           <Plus size={15} /> Add Item
         </button>
@@ -166,6 +171,15 @@ export default function ClosetView({
 
       {showAddForm && (
         <AddItemForm onAdd={onAddItem} onClose={() => setShowAddForm(false)} />
+      )}
+
+      {showCsvImport && (
+        <CsvImportModal
+          onImport={(newItems) => {
+            for (const item of newItems) onAddItem(item);
+          }}
+          onClose={() => setShowCsvImport(false)}
+        />
       )}
 
       {selectedItem && (
