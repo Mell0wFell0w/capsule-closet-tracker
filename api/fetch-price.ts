@@ -14,7 +14,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const params = new URLSearchParams({
-    engine: "google_shopping",
+    engine: "google_shopping_light",
     q: query.trim(),
     api_key: apiKey,
   });
